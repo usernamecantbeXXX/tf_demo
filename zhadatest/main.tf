@@ -36,3 +36,4 @@ resource "kubernetes_pod" "frontend" {
     }
   }
 }
+# https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/pod
