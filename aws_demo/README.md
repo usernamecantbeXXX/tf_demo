@@ -40,7 +40,9 @@ aws iam get-user
 ```
 https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-build
 
-- "variables.tf"，它将包含关于我们的AWS区域和我们要使用的实例类型的信息。
-- gateway.tf文件并在此定义互联网网关和NAT网关
-- subnets.tf VPC内部的私有和公共子网
 - main.tf 基础设施的定义
+- "variables.tf"，它将包含关于我们的AWS区域和我们要使用的实例类型的信息。
+- "vpc.tf" 定义vpc
+- gateway.tf文件并在此定义互联网网关和NAT网关
+- route-table.tf 定义路由表，并关联路由表和nat/igw 网关
+- subnets.tf VPC内部的私有和公共子网
