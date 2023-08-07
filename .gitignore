@@ -5,3 +5,4 @@
 /.idea/sshConfigs.xml
 /.idea/webServers.xml
 ./aws_demo/main.tf
+/aws_demo/main.tf
