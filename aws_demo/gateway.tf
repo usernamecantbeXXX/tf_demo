@@ -11,6 +11,9 @@ resource "aws_internet_gateway" "IGW" {
 
 resource "aws_eip" "myEIP" {
   domain   = "vpc"
+  tags = {
+    Name = "tf-demo-eip"
+  }
 }
 
 # Create NAT Gateway resource and attach it to the VPC

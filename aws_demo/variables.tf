@@ -3,15 +3,14 @@ variable "aws_region" {
   default   = "cn-north-1"
 }
 
-
 variable "vpc-cidr" {
-  cidr_block = "11.1.0.0/16"
+  default = "11.1.0.0/16"
 }
 
 variable "pubsubcidr" {
-  cidr_block = "11.1.0.0/24"
+  default = "11.1.0.0/24"
 }
 
 variable "prisubcidr" {
-  cidr_block = "11.1.1.0/24"
+  default = "11.1.1.0/24"
 }
