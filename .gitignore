@@ -1,6 +1,6 @@
 /gold-surface-337314-153bb977f7af.json
 /gold-surface-337314-153bb977f7af.json
-/**/.terraform/*
+#/**/.terraform/*
 /.idea/deployment.xml
 /.idea/sshConfigs.xml
 /.idea/webServers.xml
