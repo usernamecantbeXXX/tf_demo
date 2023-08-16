@@ -3,9 +3,23 @@
 
 provider "aws" {
   region = var.region
+  shared_credentials_files = ["/home/ubuntu/.aws/credentials"]
+  shared_config_files = ["/home/ubuntu/.aws/config"]
 }
 
 data "aws_availability_zones" "available" {}
+
+data "aws_key_pair" "k8s" {
+  key_name           = "k8s"
+  include_public_key = true
+}
+
+data "aws_security_groups" "ekssg" {
+  tags = {
+    kubernetes.io/cluster/dcfsafasdf = "owned"
+    Name = "eks-cluster-sg-dcfsafasdf-1784880539"
+  }
+}
 
 locals {
   cluster_name = "education-eks-${random_string.suffix.result}"
@@ -25,8 +39,8 @@ module "vpc" {
   cidr = "12.0.0.0/16"
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+  private_subnets = ["12.0.1.0/24", "12.0.2.0/24", "12.0.3.0/24"]
+  public_subnets  = ["12.0.4.0/24", "12..5.0/24", "12.0.6.0/24"]
 
   enable_nat_gateway   = true
   single_nat_gateway   = true
@@ -52,35 +66,68 @@ module "eks" {
 
   cluster_endpoint_public_access = true
 
+  cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
+  }
+
   vpc_id                         = module.vpc.vpc_id
   subnet_ids                     = module.vpc.private_subnets
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
-
   }
 
   eks_managed_node_groups = {
     one = {
-      name = "node-group-1"
-
-      instance_types = ["t3.small"]
-
-      min_size     = 1
+      name = "node-group-tf"
+      min_size     = 3
       max_size     = 3
-      desired_size = 2
+      desired_size = 3
+
+      instance_types = ["t3a.2xlarge"]
+      capacity_type  = "ON_DEMAND"
+      use_custom_launch_template = false
+      disk_size = 50
+      subnet_ids = module.vpc.public_subnets
+      remote_access = {
+        ec2_ssh_key               = data.aws_key_pair.k8s.id
+        source_security_group_ids = data.aws_security_groups.ekssg.ids
+      }
+
+      labels = {
+        Environment = "test"
+        GithubRepo  = "terraform-aws-eks"
+        GithubOrg   = "terraform-aws-modules"
+      }
+
+      taints = {
+        dedicated = {
+          key    = "dedicated"
+          value  = "gpuGroup"
+          effect = "NO_SCHEDULE"
+        }
+      }
+
+      update_config = {
+        max_unavailable_percentage = 33 # or set `max_unavailable`
+      }
+
+      tags = {
+        ExtraTag = "example"
+      }
+
     }
 
-    two = {
-      name = "node-group-2"
-
-      instance_types = ["t3.small"]
-
-      min_size     = 1
-      max_size     = 2
-      desired_size = 1
-    }
   }
+
 }
 
 

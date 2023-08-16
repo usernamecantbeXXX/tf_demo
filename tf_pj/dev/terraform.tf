@@ -1,12 +1,16 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
-
 terraform {
-
-  cloud {
-    workspaces {
-      name = "learn-terraform-eks"
-    }
+#
+#  cloud {
+#    workspaces {
+#      name = "learn-terraform-eks"
+#    }
+#  }
+  backend "s3" {
+    bucket = "xxxbm0409tfstate2"
+    key    = "backend/terraform.tfstate"
+    region = "cn-north-1"
+    encrypt        = true
+    dynamodb_table = "tflockid"
   }
 
   required_providers {
@@ -33,4 +37,3 @@ terraform {
 
   required_version = "~> 1.3"
 }
-
