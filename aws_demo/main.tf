@@ -7,6 +7,7 @@ terraform {
   }
 }
 
+# 使用AWS CLI配置文件
 provider "aws" {
   region                = var.aws_region
   shared_credentials_files = ["/home/ubuntu/.aws/credentials"]
