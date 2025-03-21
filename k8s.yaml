@@ -1,22 +1,38 @@
-apiVersion: apps/v1
-kind: Deployment
+#kubectl create cj build -n hacker-company --image=gcc:latest --schedule='* * * * *'  -o yaml --dry-run=server > ./definition.yaml
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  name: Title
-  labels:
-    app: Title
+  name: build
+  namespace: hacker-company
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: Title
-  template:
+  concurrencyPolicy: Replace
+  failedJobsHistoryLimit: 1
+  jobTemplate:
     metadata:
-      name: Title
-      labels:
-        app: Title
+      name: build
     spec:
-      containers:
-        - name: Title
-          image: Image
-          imagePullPolicy: IfNotPresent
-      restartPolicy: Always
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+            - image: gcc:latest
+              imagePullPolicy: Always
+              name: build
+              command:
+                - /bin/sh
+                - -c
+                # - pwd; cd /mnt/src; pwd; ls -al;  touch aa.txt
+                - cd /mnt/src; gcc -o build main.c
+              volumeMounts:
+                - name: cj
+                  mountPath: /mnt/src
+          volumes:
+            - name: cj
+              hostPath:
+                path: /home/ubuntu/1171986-kubernetes-cronjob-basic-implementation/src
+          terminationGracePeriodSeconds: 30
+          restartPolicy: Never
+  schedule: '* * * * *'
+  successfulJobsHistoryLimit: 3
+  suspend: false
